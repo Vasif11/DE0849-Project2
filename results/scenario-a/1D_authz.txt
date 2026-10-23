@@ -1,0 +1,6 @@
+$ bash -c docker exec scenario-b-ue curl -s --cacert /etc/telecom-lab/ca.crt --max-time 10 -o /dev/null -w 'unauth GET /profile/ -> %{http_code} (redirect: %{redirect_url})\n' 'https://10.20.6.20/profile/'
+unauth GET /profile/ -> 302 (redirect: https://10.20.6.20/accounts/login/?next=/profile/)
+
+$ bash -c docker exec scenario-b-ue curl -s --cacert /etc/telecom-lab/ca.crt --max-time 10 -o /dev/null -w 'unauth GET /feedback/ -> %{http_code} (redirect: %{redirect_url})\n' 'https://10.20.6.20/feedback/'
+unauth GET /feedback/ -> 302 (redirect: https://10.20.6.20/accounts/login/?next=/feedback/)
+

@@ -1,0 +1,29 @@
+## TLS versions (curl, CA-validated)
+TLS1.2 handshake HTTP 200
+TLS1.3 handshake HTTP 200
+TLS1.0 (must fail): HTTP 000
+rejected (expected)
+
+## login flow
+login POST -> 302 (redirect https://10.20.6.20/profile/)
+
+## authenticated access
+auth GET /profile/ -> 200
+Username: securityadmin
+Authenticated: True
+auth GET /feedback/ -> 200
+
+## CSRF enforcement
+extracted feedback CSRF token length: 64
+valid-CSRF   POST /feedback/ -> 200 (expect 200)
+missing-CSRF POST /feedback/ -> 403 (expect 403)
+
+## security headers (HTTPS GET /)
+x-frame-options: DENY
+strict-transport-security: max-age=3600
+x-content-type-options: nosniff
+referrer-policy: same-origin
+
+## secure cookies (Set-Cookie on login)
+set-cookie: csrftoken=aiXGaHCKiqvFlDWPCRcTyheC9Lcj1CH4; expires=Fri, 22 Oct 2027 18:44:42 GMT; Max-Age=31449600; Path=/; SameSite=Lax; Secure
+set-cookie: sessionid=856ux2f6yd52a0u0sjkzps6ith3vpw2p; expires=Fri, 06 Nov 2026 18:44:42 GMT; HttpOnly; Max-Age=1209600; Path=/; SameSite=Lax; Secure

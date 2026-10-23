@@ -1,0 +1,18 @@
+$ bash -c echo 'UE PDU address:'; nsenter -t 135531 -n ip -br addr show uesimtun0
+UE PDU address:
+uesimtun0        UNKNOWN        10.45.0.2/16 fe80::f96f:e98b:be3:5e31/64 
+
+$ docker exec scenario-b-ue ip route get 10.20.6.20
+10.20.6.20 dev uesimtun0 src 10.45.0.2 uid 0 
+    cache 
+
+$ docker exec scenario-b-ue ping -c 3 -W 2 10.20.6.20
+PING 10.20.6.20 (10.20.6.20) 56(84) bytes of data.
+64 bytes from 10.20.6.20: icmp_seq=1 ttl=63 time=1.24 ms
+64 bytes from 10.20.6.20: icmp_seq=2 ttl=63 time=0.966 ms
+64 bytes from 10.20.6.20: icmp_seq=3 ttl=63 time=1.47 ms
+
+--- 10.20.6.20 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2003ms
+rtt min/avg/max/mdev = 0.966/1.223/1.470/0.205 ms
+

@@ -1,0 +1,15 @@
+$ openssl x509 -in /mnt/c/Users/Vasif/OneDrive/Desktop/senario/DE0849-Project2/secrets/tls/server.crt -noout -subject -issuer -dates -ext subjectAltName
+subject=C=LV, O=Telecom Lab, OU=DE0849 Project 2, CN=telecom-lab.local
+issuer=C=LV, O=Telecom Lab, OU=DE0849 Project 2, CN=Telecom Lab Root CA
+notBefore=Oct 23 18:36:09 2026 GMT
+notAfter=Jan 25 18:36:09 2029 GMT
+X509v3 Subject Alternative Name: 
+    IP Address:10.20.6.20, DNS:telecom-lab.local, DNS:localhost
+
+$ bash -c docker exec scenario-b-ue curl -s --cacert /etc/telecom-lab/ca.crt --max-time 10 -o /dev/null -D - http://10.20.6.20/ | grep -iE 'HTTP/|location'
+HTTP/1.1 301 Moved Permanently
+Location: https://10.20.6.20/
+
+$ bash -c docker exec scenario-b-ue curl -s --cacert /etc/telecom-lab/ca.crt --max-time 10 -o /dev/null -w 'HTTPS GET / -> %{http_code}\n' https://10.20.6.20/
+HTTPS GET / -> 200
+

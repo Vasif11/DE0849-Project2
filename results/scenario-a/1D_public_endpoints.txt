@@ -1,0 +1,16 @@
+$ bash -c docker exec scenario-b-ue curl -s --cacert /etc/telecom-lab/ca.crt --max-time 10 -o /dev/null -w 'GET / -> %{http_code}\n' 'https://10.20.6.20/'
+GET / -> 200
+
+$ bash -c docker exec scenario-b-ue curl -s --cacert /etc/telecom-lab/ca.crt --max-time 10 -o /dev/null -w 'GET /health/ -> %{http_code}\n' 'https://10.20.6.20/health/'
+GET /health/ -> 200
+
+$ bash -c docker exec scenario-b-ue curl -s --cacert /etc/telecom-lab/ca.crt --max-time 10 -o /dev/null -w 'GET /api/status/ -> %{http_code}\n' 'https://10.20.6.20/api/status/'
+GET /api/status/ -> 200
+
+$ bash -c docker exec scenario-b-ue curl -s --cacert /etc/telecom-lab/ca.crt --max-time 10 -o /dev/null -w 'GET /search/?q=security -> %{http_code}\n' 'https://10.20.6.20/search/?q=security'
+GET /search/?q=security -> 200
+
+$ bash -c docker exec scenario-b-ue curl -s --cacert /etc/telecom-lab/ca.crt --max-time 10 https://10.20.6.20/health/
+{"service": "project2-django", "status": "ok", "project": "Telecommunication Security"}
+$ bash -c docker exec scenario-b-ue curl -s --cacert /etc/telecom-lab/ca.crt --max-time 10 https://10.20.6.20/api/status/
+{"status": "operational", "service": "project2-django", "time": "2026-10-23T18:44:41.574039+00:00", "authenticated": false}

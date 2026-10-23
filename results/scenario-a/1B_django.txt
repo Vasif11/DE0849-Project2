@@ -1,0 +1,13 @@
+$ docker inspect -f {{.Name}} health={{.State.Health.Status}} image={{.Config.Image}} scenario-b-django
+/scenario-b-django health=healthy image=telecom-lab-django:0.1
+
+$ docker exec scenario-b-nginx curl -s http://10.20.8.20:8000/health/
+{"service": "project2-django", "status": "ok", "project": "Telecommunication Security"}
+$ docker exec scenario-b-django sh -c ls -la /app/data/db.sqlite3
+-rw-r--r-- 1 root root 139264 Oct 23 18:43 /app/data/db.sqlite3
+
+$ docker network inspect scenario-b-app --format {{range .Containers}}{{.Name}} {{.IPv4Address}}{{"\n"}}{{end}}
+scenario-b-django 10.20.8.20/24
+scenario-b-nginx 10.20.8.10/24
+
+
