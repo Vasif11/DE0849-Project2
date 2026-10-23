@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Feedback</h1>
+  {% if saved %}<p><strong>Thank you, your feedback was recorded.</strong></p>{% endif %}
+  <form method="post" action="{% url 'feedback' %}">
+    {% csrf_token %}
+    <textarea name="message" rows="4" cols="50" placeholder="your message"></textarea><br>
+    <button type="submit">Submit</button>
+  </form>
+  {% if recent %}
+    <h2>Your recent feedback</h2>
+    <ul>{% for f in recent %}<li>{{ f.created_at }}: {{ f.message }}</li>{% endfor %}</ul>
+  {% endif %}
+{% endblock %}

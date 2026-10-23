@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Search</h1>
+  <form method="get">
+    <input type="text" name="q" value="{{ query }}" placeholder="search term">
+    <button type="submit">Search</button>
+  </form>
+  {% if query %}
+    <p>Results for &ldquo;{{ query }}&rdquo;:</p>
+    <ul>
+      {% for r in results %}<li>{{ r }}</li>{% empty %}<li>No matches.</li>{% endfor %}
+    </ul>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Project 2 - Secure Telecom Service{% endblock %}</title>
+</head>
+<body>
+  <header>
+    <strong>Telecommunication Security</strong> &mdash; Scenario A
+    <nav>
+      <a href="{% url 'home' %}">Home</a> |
+      <a href="{% url 'search' %}">Search</a> |
+      <a href="{% url 'profile' %}">Profile</a> |
+      <a href="{% url 'feedback' %}">Feedback</a> |
+      {% if user.is_authenticated %}
+        <form action="{% url 'logout' %}" method="post" style="display:inline">{% csrf_token %}
+          <button type="submit">Logout ({{ user.username }})</button>
+        </form>
+      {% else %}
+        <a href="{% url 'login' %}">Login</a>
+      {% endif %}
+    </nav>
+  </header>
+  <hr>
+  <main>{% block content %}{% endblock %}</main>
+</body>
+</html>

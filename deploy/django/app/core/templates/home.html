@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Secure telecommunication application</h1>
+  <p>This Django application is served over the 5G user plane through an Nginx TLS gateway:</p>
+  <p>UE &rarr; gNB &rarr; N3/GTP-U &rarr; UPF &rarr; N6 &rarr; Nginx (HTTPS, 10.20.6.20) &rarr; app-net &rarr; Django (10.20.8.20:8000)</p>
+  <ul>
+    <li>Public: <a href="{% url 'home' %}">/</a>, <a href="{% url 'health' %}">/health/</a>,
+        <a href="{% url 'api_status' %}">/api/status/</a>, <a href="{% url 'search' %}">/search/</a></li>
+    <li>Protected: <a href="{% url 'profile' %}">/profile/</a>, <a href="{% url 'feedback' %}">/feedback/</a></li>
+  </ul>
+{% endblock %}

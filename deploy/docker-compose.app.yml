@@ -1,0 +1,43 @@
+# Scenario A application layer: Django internal app + Nginx TLS gateway.
+# Brought up alongside docker-compose.5g.yml (shares the external dn-net / scenario-b-dn).
+#
+#   UE -> 5G PDU -> UPF -> N6 (dn-net) -> Nginx 10.20.6.20 (HTTPS) -> app-net -> Django 10.20.8.20:8000
+name: scenario-b
+
+services:
+  django:
+    build: ./django
+    image: telecom-lab-django:0.1
+    container_name: scenario-b-django
+    env_file: [.env]
+    networks:
+      app-net: { ipv4_address: 10.20.8.20 }   # internal application network only (not on dn-net)
+    volumes:
+      - django-data:/app/data                 # SQLite survives container recreation
+    restart: unless-stopped
+
+  nginx:
+    build: ./nginx
+    image: telecom-lab-nginx:p2
+    container_name: scenario-b-nginx
+    cap_add: [NET_ADMIN]                       # install the return route to the UE PDU pool
+    networks:
+      dn-net:  { ipv4_address: 10.20.6.20 }    # N6-facing gateway (replaces the plain P1 nginx)
+      app-net: { ipv4_address: 10.20.8.10 }    # internal link to Django
+    volumes:
+      - ../secrets/tls/server.crt:/etc/nginx/tls/server.crt:ro
+      - ../secrets/tls/server.key:/etc/nginx/tls/server.key:ro
+    depends_on: [django]
+    restart: unless-stopped
+
+networks:
+  app-net:
+    name: scenario-b-app
+    driver_opts: { com.docker.network.bridge.name: br-app }
+    ipam: { config: [{ subnet: 10.20.8.0/24, gateway: 10.20.8.1 }] }
+  dn-net:
+    external: true
+    name: scenario-b-dn                        # defined in docker-compose.5g.yml
+
+volumes:
+  django-data:
