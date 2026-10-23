@@ -1,0 +1,21 @@
+# Secrets and private keys (never commit) -- required by the guidebook
+deploy/.env
+.env
+secrets/
+pki/ca.key
+pki/*.srl
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Large datasets and raw captures (kept local)
+ids-dataset/raw/
+*.rar
+*.pcap
+*.pcapng
+
+# build artifacts
+*.log
