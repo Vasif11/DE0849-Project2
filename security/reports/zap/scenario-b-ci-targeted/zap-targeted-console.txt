@@ -1,0 +1,33 @@
+Found Java version 17.0.20.1
+Available memory: 3916 MB
+Using JVM args: -Xmx979m
+1124 [main] INFO  org.parosproxy.paros.Constant - Copying default configuration to /home/zap/.ZAP/config.xml
+1286 [main] INFO  org.parosproxy.paros.Constant - Creating directory /home/zap/.ZAP/session
+1287 [main] INFO  org.parosproxy.paros.Constant - Creating directory /home/zap/.ZAP/dirbuster
+1288 [main] INFO  org.parosproxy.paros.Constant - Creating directory /home/zap/.ZAP/fuzzers
+1289 [main] INFO  org.parosproxy.paros.Constant - Creating directory /home/zap/.ZAP/plugin
+Oct 23, 2026 7:04:57 PM java.util.prefs.FileSystemPreferences$1 run
+INFO: Created user preferences directory.
+Job spider set context = juice-shop
+Job spider set url = http://10.20.10.20:3000
+Job spider set maxDuration = 1
+Job spider set maxDepth = 3
+Job requestor set user = 
+Job requestor set url = http://10.20.10.20:3000/rest/user/login
+Job requestor set method = POST
+Job requestor set data = {"email":"test@test.local","password":"test"}
+Job activeScan set context = juice-shop
+Job activeScan set policy = sqli-only
+Job activeScan set maxRuleDurationInMins = 2
+Job activeScan set maxScanDurationInMins = 5
+Failed to invoke requestor.setHeaders : null
+Job activeScan set defaultStrength = high
+Job activeScan set defaultThreshold = off
+Job report set template = traditional-json
+Job report set reportDir = /zap/wrk/reports
+Job report set reportFile = scenario-b-ci-targeted
+Job report set template = traditional-md
+Job report set reportDir = /zap/wrk/reports
+Job report set reportFile = scenario-b-ci-targeted
+Automation plan failures:
+	Failed to invoke requestor.setHeaders : null

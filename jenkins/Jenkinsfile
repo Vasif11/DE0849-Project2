@@ -1,0 +1,97 @@
+// Scenario B - Jenkins-orchestrated Security Validation Pipeline (DE0849 Project 2).
+//
+// Defines the mandatory stage order. On a host with sufficient RAM this runs inside
+// scenario-b-jenkins (telecom-lab-jenkins) with access to /var/run/docker.sock, launching the
+// security tools as controlled Docker jobs. On the 4 GB lab host the identical stages are executed
+// by scripts/run_pipeline.sh; this file is the CI definition and keeps the ordering explicit.
+//
+// Parameters: GATE_MODE (REPORT_ONLY | ENFORCE)
+
+pipeline {
+  agent any
+  parameters {
+    choice(name: 'GATE_MODE', choices: ['REPORT_ONLY', 'ENFORCE'], description: 'Security Gate policy')
+  }
+  environment {
+    RUN_ID    = "${env.BUILD_TAG}"
+    JUICE_URL = "http://10.20.10.20:3000"
+    GRID_URL  = "http://10.20.10.30:4444"
+    NET       = "scenario-b-security"
+    WS        = "/workspace"           // project checkout mounted into Jenkins
+  }
+
+  stages {
+    stage('1E Scenario A acceptance') {
+      steps { sh 'test -f $WS/results/scenario-a/1E_app_security_from_ue.txt' }
+    }
+    stage('2A Preflight') {
+      steps { sh '$WS/scripts/stages/preflight.sh' }
+    }
+    stage('2B-1 ZAP Baseline') {
+      steps {
+        sh '''docker run --rm --network $NET -v $WS/security/reports/zap/scenario-b-ci:/zap/wrk:rw \
+              ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t $JUICE_URL \
+              -J scenario-b-ci.json -w scenario-b-ci.md -r scenario-b-ci.html || true'''
+      }
+    }
+    stage('2B-2 Selenium Runtime/Auth') {
+      steps { sh 'RUN_ID=$RUN_ID SELENIUM_URL=$GRID_URL JUICE_URL=$JUICE_URL python3 $WS/security/selenium/login_storage_test.py' }
+    }
+    stage('2B-3 Start Fresh Capture') {
+      steps { sh '$WS/scripts/stages/capture_start.sh' }
+    }
+    stage('2B-4 Controlled SQLi Positive Control') {
+      steps { sh 'curl -s -o /dev/null "$JUICE_URL/rest/products/search?q=%27%28"' }
+    }
+    stage('2B-5 Targeted ZAP SQLi') {
+      steps {
+        sh '''cp $WS/security/zap/plan.yaml $WS/security/reports/zap/scenario-b-ci-targeted/plan.yaml
+              docker run --rm --network $NET -v $WS/security/reports/zap/scenario-b-ci-targeted:/zap/wrk:rw \
+                ghcr.io/zaproxy/zaproxy:stable zap.sh -cmd -autorun /zap/wrk/plan.yaml || true
+              jq -e \'[.site[].alerts[]|select(.pluginid=="40018")]|length>=1\' \
+                 $WS/security/reports/zap/scenario-b-ci-targeted/reports/scenario-b-ci-targeted.json'''
+      }
+    }
+    stage('2C Stop Capture + Validate PCAP') {
+      steps { sh '$WS/scripts/stages/capture_stop.sh' }
+    }
+    stage('2C Suricata Offline Analysis') {
+      steps {
+        sh '''docker run --rm \
+                -v $WS/security/traffic/scenario-b/ci/juice-shop-ci-sqli.pcapng:/pcap/p.pcapng:ro \
+                -v $WS/security/suricata/suricata.yaml:/etc/suricata/suricata.yaml:ro \
+                -v $WS/security/ids/rules:/rules:ro \
+                -v $WS/security/ids/scenario-b/ci:/output:rw \
+                jasonish/suricata:8.0 suricata -c /etc/suricata/suricata.yaml -r /pcap/p.pcapng -l /output
+              grep -q \'"signature_id":1000001\' $WS/security/ids/scenario-b/ci/eve.json'''
+      }
+    }
+    stage('2C-Advanced Traffic Intelligence') {
+      steps { sh 'RUN_ID=$RUN_ID python3 $WS/security/traffic-intelligence/extract_features.py || true' }
+    }
+    stage('2D Trivy Vulnerability Scan') {
+      steps {
+        sh '''docker run --rm -v $WS/security/scans/trivy-ci:/out:rw aquasec/trivy:0.75.0 \
+                image --scanners vuln --format json -o /out/juice-shop-v20.2.0.json bkimminich/juice-shop:v20.2.0'''
+      }
+    }
+    stage('2D Syft CycloneDX SBOM') {
+      steps {
+        sh '''docker run --rm anchore/syft:v1.52.0 bkimminich/juice-shop:v20.2.0 -o cyclonedx-json \
+                > $WS/security/sbom-ci/juice-shop-v20.2.0.cdx.json'''
+      }
+    }
+    stage('2E Security Evidence Correlation') {
+      steps { sh 'RUN_ID=$RUN_ID python3 $WS/security/correlation/scenario-b/correlate_scenario_b.py' }
+    }
+    stage('Evidence Archive') {
+      steps { archiveArtifacts artifacts: 'security/**, ci-artifacts/**', allowEmptyArchive: true }
+    }
+    stage('Security Gate') {
+      steps { sh 'GATE_MODE=$GATE_MODE $WS/scripts/stages/security_gate.sh' }
+    }
+  }
+  post {
+    always { echo "Scenario B pipeline finished: RUN_ID=${env.RUN_ID}, GATE_MODE=${params.GATE_MODE}" }
+  }
+}

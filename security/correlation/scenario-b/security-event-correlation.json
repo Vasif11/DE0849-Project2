@@ -1,0 +1,53 @@
+{
+  "run_id": "20261023-220309",
+  "generated_at": "2026-10-23T22:06:44",
+  "target": {
+    "host": "10.20.10.20",
+    "port": 3000
+  },
+  "controlled_signature": "/rest/products/search?q=%27%28",
+  "observations": {
+    "zap_targeted": {
+      "present": false,
+      "alert_40018_count": 0,
+      "artifact": "security/reports/zap/scenario-b-ci-targeted/scenario-b-ci-targeted.json"
+    },
+    "selenium_runtime": {
+      "present": false,
+      "login_success": false,
+      "login_method": null,
+      "artifact": "security/selenium/evidence/juice-shop-auth-storage.json"
+    },
+    "pcap": {
+      "exists": true,
+      "size_bytes": 30888,
+      "packets": 54,
+      "sqli_request_present": true,
+      "artifact": "security/traffic/scenario-b/ci/juice-shop-ci-sqli.pcapng"
+    },
+    "suricata_sid_1000001": {
+      "count": 0,
+      "events": [],
+      "artifact": "security/ids/scenario-b/ci/eve.json"
+    }
+  },
+  "archived_software_evidence": {
+    "trivy_report": {
+      "present": true,
+      "artifact": "security/scans/trivy-ci/juice-shop-v20.2.0.json"
+    },
+    "sbom_cyclonedx": {
+      "present": true,
+      "artifact": "security/sbom-ci/juice-shop-v20.2.0.cdx.json"
+    },
+    "note": "Trivy/SBOM are archived evidence; this correlation does not consume them (see LLM cross-validation)."
+  },
+  "correlation": {
+    "application_security_detection_zap": false,
+    "network_detection_suricata": false,
+    "controlled_traffic_captured": true,
+    "runtime_authentication_validated": false,
+    "status": "NOT_CORRELATED",
+    "chain": "controlled SQLi activity -> ZAP app-security finding (40018) -> captured PCAP -> Suricata network detection (SID 1000001) -> correlation -> security decision"
+  }
+}

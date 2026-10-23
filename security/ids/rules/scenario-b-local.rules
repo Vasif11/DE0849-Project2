@@ -1,0 +1,13 @@
+# Scenario B local IDS rules (offline Suricata analysis of the controlled SQLi PCAP).
+#
+# SID 1000001 - detects the deterministic network positive control:
+#   GET /rest/products/search?q=%27%28   (URL-encoded single-quote + open-parenthesis)
+# matched against the controlled Juice Shop target. http.uri.raw is used so the exact encoded
+# bytes are matched regardless of Suricata URI normalisation.
+alert http any any -> any any ( \
+    msg:"LOCAL Scenario B SQLi test - encoded quote/parenthesis in product search"; \
+    flow:established,to_server; \
+    http.method; content:"GET"; \
+    http.uri.raw; content:"/rest/products/search"; content:"q=%27%28"; \
+    classtype:web-application-attack; \
+    sid:1000001; rev:1; )

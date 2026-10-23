@@ -1,0 +1,6 @@
+git
+docker-workflow
+credentials-binding
+timestamper
+htmlpublisher
+workflow-aggregator

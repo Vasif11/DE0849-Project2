@@ -1,0 +1,54 @@
+# Scenario B security-testing environment (isolated from the secure Scenario A app and the 5G plane).
+#   security-net 10.20.10.0/24: Juice Shop (controlled vulnerable target) + Selenium Grid.
+# ZAP, Suricata, Trivy, Syft, capture and correlation are launched on demand (not persistent IPs).
+# Jenkins is optional (profile "jenkins") because of the 4 GB lab-host RAM budget.
+name: scenario-b-secops
+
+services:
+  juice-shop:
+    image: bkimminich/juice-shop:v20.2.0
+    container_name: juice-shop
+    environment:
+      NODE_ENV: unsafe        # enable the full set of challenges on the controlled target
+    networks:
+      security-net: { ipv4_address: 10.20.10.20 }
+    ports: ["127.0.0.1:3000:3000"]
+    restart: unless-stopped
+
+  selenium:
+    image: telecom-lab-selenium:1.0
+    container_name: scenario-b-selenium
+    shm_size: "1gb"           # Chromium needs shared memory
+    environment:
+      SE_NODE_MAX_SESSIONS: "1"
+    networks:
+      security-net: { ipv4_address: 10.20.10.30 }
+    ports: ["127.0.0.1:4444:4444"]
+    restart: unless-stopped
+
+  # Optional CI orchestrator. Start with:  docker compose --profile jenkins up -d
+  jenkins:
+    build: ../jenkins
+    image: telecom-lab-jenkins:lts-jdk21
+    container_name: scenario-b-jenkins
+    profiles: ["jenkins"]
+    user: root               # needs access to the Docker socket to launch tool containers
+    environment:
+      JAVA_OPTS: "-Djenkins.install.runSetupWizard=false -Xmx768m"
+    networks:
+      security-net: { ipv4_address: 10.20.10.10 }
+    ports: ["127.0.0.1:8080:8080"]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - jenkins-home:/var/jenkins_home
+      - ..:/workspace:rw     # project checkout available to the pipeline
+    restart: unless-stopped
+
+networks:
+  security-net:
+    name: scenario-b-security
+    driver_opts: { com.docker.network.bridge.name: br-sec }
+    ipam: { config: [{ subnet: 10.20.10.0/24, gateway: 10.20.10.1 }] }
+
+volumes:
+  jenkins-home:

@@ -1,0 +1,52 @@
+%YAML 1.1
+---
+# Minimal, self-contained Suricata configuration for OFFLINE analysis of the Scenario B PCAP.
+# It is mounted read-only into the ephemeral Suricata job and uses only the Scenario B local rules.
+vars:
+  address-groups:
+    HOME_NET: "any"
+    EXTERNAL_NET: "any"
+  port-groups:
+    HTTP_PORTS: "3000,80,8080"
+
+default-log-dir: /output
+
+# Only the Scenario B local rule set (deterministic, no external rule downloads).
+default-rule-path: /rules
+rule-files:
+  - scenario-b-local.rules
+
+app-layer:
+  protocols:
+    http:
+      enabled: yes
+
+outputs:
+  - eve-log:
+      enabled: yes
+      filetype: regular
+      filename: eve.json
+      types:
+        - alert:
+            payload: yes
+            payload-printable: yes
+            http: yes
+        - http:
+            extended: yes
+        - flow
+  - fast:
+      enabled: yes
+      filename: fast.log
+  - stats:
+      enabled: yes
+      filename: stats.log
+      totals: yes
+
+logging:
+  default-log-level: info
+  outputs:
+    - console:
+        enabled: yes
+    - file:
+        enabled: yes
+        filename: /output/suricata.log

@@ -1,0 +1,6 @@
+time,src,dst,dport,method,uri,frame_len,uri_len,special_chars,digit_count,has_query,sqli_token_hits,is_encoded_quote_paren,anomaly_score,anomaly
+1792782282.62003,10.20.10.1,10.20.10.20,3000,GET,"/rest/products/search?q=%27%28",175,30,3,4,1,2,1,1.9864,1
+1792782282.721593,10.20.10.1,10.20.10.20,3000,GET,"/rest/products/search?q=apple",174,29,1,0,1,0,0,-0.4214,0
+1792782282.77059,10.20.10.1,10.20.10.20,3000,GET,"/rest/products/search?q=juice",174,29,1,0,1,0,0,-0.4214,0
+1792782282.830657,10.20.10.1,10.20.10.20,3000,GET,"/",146,1,0,0,0,0,0,-0.7223,0
+1792782282.841671,10.20.10.1,10.20.10.20,3000,GET,"/rest/admin/application-version",176,31,1,0,0,0,0,-0.4214,0

@@ -1,0 +1,57 @@
+# OWASP ZAP Automation Framework plan - targeted SQL Injection positive control.
+# Runs a short spider for context, then an active scan limited to alert 40018 (SQL Injection)
+# against the Juice Shop login endpoint, and asserts that at least one 40018 alert is produced.
+env:
+  contexts:
+    - name: juice-shop
+      urls:
+        - "http://10.20.10.20:3000"
+      includePaths:
+        - "http://10.20.10.20:3000.*"
+  parameters:
+    failOnError: true
+    progressToStdout: true
+
+jobs:
+  - type: spider
+    parameters:
+      context: juice-shop
+      url: "http://10.20.10.20:3000"
+      maxDuration: 1
+      maxDepth: 3
+
+  - type: requestor
+    requests:
+      # seed the known SQLi-vulnerable endpoints so the active scanner has attack points in scope
+      - url: "http://10.20.10.20:3000/rest/products/search?q=test"
+        method: "GET"
+      - url: "http://10.20.10.20:3000/rest/user/login"
+        method: "POST"
+        data: '{"email":"test@test.local","password":"test"}'
+
+  - type: activeScan
+    parameters:
+      context: juice-shop
+      maxRuleDurationInMins: 2
+      maxScanDurationInMins: 5
+    policyDefinition:
+      defaultStrength: "high"
+      defaultThreshold: "off"
+      rules:
+        - id: 40018          # SQL Injection
+          name: "SQL Injection"
+          strength: "high"
+          threshold: "low"
+
+  - type: report
+    parameters:
+      template: "traditional-json"
+      reportDir: "/zap/wrk/reports"
+      reportFile: "scenario-b-ci-targeted"
+    risks: ["high", "medium", "low", "info"]
+
+  - type: report
+    parameters:
+      template: "traditional-md"
+      reportDir: "/zap/wrk/reports"
+      reportFile: "scenario-b-ci-targeted"

@@ -13,9 +13,15 @@ venv/
 
 # Large datasets and raw captures (kept local)
 ids-dataset/raw/
+ids-dataset/data/iscx_flows.csv
 *.rar
-*.pcap
-*.pcapng
+
+# per-run archive copy is redundant with the committed security/ evidence
+ci-artifacts/
+
+# ZAP writes a large session DB next to the reports
+security/reports/zap/**/*.session*
+security/reports/zap/**/*.session
 
 # build artifacts
 *.log
