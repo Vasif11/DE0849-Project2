@@ -22,7 +22,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-CSV = os.path.join(HERE, "data", "iscx_flows.csv")
+CSV = os.environ.get("ISCX_CSV", os.path.join(HERE, "data", "iscx_flows.csv"))
 RES = os.path.join(HERE, "results")
 FIG = os.path.join(HERE, "figures")
 os.makedirs(RES, exist_ok=True)
@@ -48,7 +48,8 @@ def main():
     for c in CAT:
         top = df[c].value_counts().nlargest(25).index
         col = c + "_code"
-        df[col] = np.where(df[c].isin(top), df[c], "other").astype("category").cat.codes
+        df[col] = pd.Series(np.where(df[c].isin(top), df[c], "other"),
+                            index=df.index).astype("category").cat.codes
         cat_cols.append(col)
     features = num + cat_cols
 

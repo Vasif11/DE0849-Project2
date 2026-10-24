@@ -134,14 +134,19 @@ sleep 2
 
 # ============================================================ 2B-5 Targeted ZAP SQLi test
 stage "2B-5 Targeted ZAP SQL Injection test (alert 40018)"
-cp "$SEC/zap/plan.yaml" "$ZAP_TGT/plan.yaml"           # persistent plan
-cp "$SEC/zap/plan.yaml" "$ARCHIVE/plan-$RUN_ID.yaml"   # executed plan tied to RUN_ID
-docker run --rm --network "$NET" -v "$ZAP_TGT:/zap/wrk:rw" "$ZAP_IMG" \
-  zap.sh -cmd -autorun /zap/wrk/plan.yaml > "$ZAP_TGT/zap-targeted-console.txt" 2>&1
+cp "$SEC/zap/plan.yaml" "$ZAP_TGT/plan.yaml"           # persistent plan (documents the intended test)
+cp "$SEC/zap/plan.yaml" "$ARCHIVE/plan-$RUN_ID.yaml"   # plan tied to RUN_ID
+# Juice Shop is an Angular SPA whose REST endpoints the traditional spider does not map, so the
+# targeted scan is driven through the ZAP API against the exact injectable endpoint (SQLi scanner
+# 40018 only, HIGH strength / LOW threshold). See security/zap/targeted_sqli_scan.py.
+docker rm -f zap-daemon >/dev/null 2>&1
+docker run -d --name zap-daemon --network "$NET" -p 127.0.0.1:8090:8090 "$ZAP_IMG" \
+  zap.sh -daemon -host 0.0.0.0 -port 8090 -config api.disablekey=true \
+  -config api.addrs.addr.name=.* -config api.addrs.addr.regex=true > "$ZAP_TGT/zap-daemon-start.txt" 2>&1
+ZAP_BASE=http://127.0.0.1:8090 TARGET="$JUICE_URL" OUT_JSON="$ZAP_TGT/scenario-b-ci-targeted.json" \
+  "$PY" "$SEC/zap/targeted_sqli_scan.py" > "$ZAP_TGT/zap-targeted-console.txt" 2>&1
 ZAP_TGT_EXIT=$?
-# move reports written under /zap/wrk/reports to the expected path
-[ -f "$ZAP_TGT/reports/scenario-b-ci-targeted.json" ] && cp "$ZAP_TGT/reports/scenario-b-ci-targeted.json" "$ZAP_TGT/scenario-b-ci-targeted.json"
-[ -f "$ZAP_TGT/reports/scenario-b-ci-targeted.md" ] && cp "$ZAP_TGT/reports/scenario-b-ci-targeted.md" "$ZAP_TGT/scenario-b-ci-targeted.md"
+docker rm -f zap-daemon >/dev/null 2>&1
 zap_sqli=$(jq '[.site[].alerts[] | select((.pluginid=="40018") or (.name|ascii_downcase|test("sql injection")))] | length' "$ZAP_TGT/scenario-b-ci-targeted.json" 2>/dev/null || echo 0)
 record "ZAP_TARGETED_EXIT=$ZAP_TGT_EXIT ZAP_SQLI_40018=$zap_sqli"
 
