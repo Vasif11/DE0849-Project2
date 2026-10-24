@@ -1,7 +1,7 @@
 # Scenario B - Security Event Correlation
 
-- Run ID: `20261023-220309`
-- Generated: 2026-10-23T22:06:44
+- Run ID: `20261024-113816`
+- Generated: 2026-10-24T11:40:36
 - Target: 10.20.10.20:3000
 - Controlled signature: `/rest/products/search?q=%27%28`
 
@@ -9,19 +9,19 @@
 
 | Layer | Tool | Result |
 |---|---|---|
-| Application security | OWASP ZAP (alert 40018) | 0 SQL Injection finding(s) |
-| Runtime / browser | Selenium | login_success = NO (None) |
-| Network traffic | PCAP | 54 packets, SQLi request present = yes |
-| Network detection | Suricata (SID 1000001) | 0 event(s) |
+| Application security | OWASP ZAP (alert 40018) | 1 SQL Injection finding(s) |
+| Runtime / browser | Selenium | login_success = yes (registered-user) |
+| Network traffic | PCAP | 105 packets, SQLi request present = yes |
+| Network detection | Suricata (SID 1000001) | 1 event(s) |
 
 ## Correlation result
 
-- Application-security detection (ZAP 40018): **NO**
+- Application-security detection (ZAP 40018): **yes**
 - Controlled traffic captured in PCAP: **yes**
-- Network detection (Suricata SID 1000001): **NO**
-- Runtime authentication validated (Selenium): **NO**
+- Network detection (Suricata SID 1000001): **yes**
+- Runtime authentication validated (Selenium): **yes**
 
-### Status: **NOT_CORRELATED**
+### Status: **CORRELATED**
 
 Chain: controlled SQLi activity -> ZAP application-security finding -> captured PCAP -> Suricata network detection -> correlation -> CI/CD security decision.
 

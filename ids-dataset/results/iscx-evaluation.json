@@ -1,0 +1,71 @@
+{
+  "dataset": "ISCXIDS2012 (labeled_flows_xml subset)",
+  "scenarios": {
+    "SatJun12": 133193,
+    "SunJun13": 275528,
+    "ThuJun17": 61832
+  },
+  "attack_categories": {
+    "BruteForce_SSH": 197,
+    "HTTP_DoS": 20358,
+    "Infiltration": 2086,
+    "Normal": 447912
+  },
+  "method": "RandomForest (supervised), 70/30 stratified split, class_weight=balanced",
+  "features": [
+    "sourcePort",
+    "destinationPort",
+    "totalSourceBytes",
+    "totalDestinationBytes",
+    "totalSourcePackets",
+    "totalDestinationPackets",
+    "duration_s",
+    "total_bytes",
+    "total_packets",
+    "bytes_ratio",
+    "protocolName_code",
+    "direction_code",
+    "appName_code"
+  ],
+  "class_imbalance": {
+    "total_flows": 470553,
+    "normal": 447912,
+    "attack": 22641,
+    "attack_fraction": 0.0481
+  },
+  "confusion_matrix": {
+    "TN": 134365,
+    "FP": 9,
+    "FN": 22,
+    "TP": 6770
+  },
+  "metrics": {
+    "precision": 0.9987,
+    "recall_detection_rate": 0.9968,
+    "f1": 0.9977,
+    "false_positive_rate": 0.0001,
+    "accuracy": 0.9998
+  },
+  "per_scenario_detection": {
+    "BruteForce_SSH": {
+      "attack_flows_in_test": 61,
+      "detected": 60,
+      "detection_rate": 0.9836
+    },
+    "HTTP_DoS": {
+      "attack_flows_in_test": 6096,
+      "detected": 6075,
+      "detection_rate": 0.9966
+    },
+    "Infiltration": {
+      "attack_flows_in_test": 635,
+      "detected": 635,
+      "detection_rate": 1.0
+    }
+  },
+  "normal_traffic": {
+    "test_normal_flows": 134374,
+    "classified_normal": 134365,
+    "misclassified_as_attack": 9
+  }
+}

@@ -1,21 +1,4 @@
-Notice: suricata: This is Suricata version 8.0.7 RELEASE running in USER mode
-Info: cpu: CPUs/cores online: 4
-Info: suricata: Setting engine mode to IDS mode by default
-Info: suricata: No 'host-mode': suricata is in IDS mode, using default setting 'sniffer-only'
-Notice: stream-tcp: stream.reassembly.depth set to unlimited by default
-Warning: counters: global stats config is missing. Stats enabled through legacy stats.log. See https://docs.suricata.io/en/suricata-8.0.7/configuration/suricata-yaml.html#stats
-Info: logopenfile: eve-log output device (regular) initialized: eve.json
-Warning: output-json-alert: Found deprecated eve-log.alert flag "http", this flag has no effect
-Info: logopenfile: fast output device (regular) initialized: fast.log
-Info: logopenfile: stats output device (regular) initialized: stats.log
-Info: detect: 1 rule files processed. 1 rules successfully loaded, 0 rules failed, 0 rules skipped
-Info: threshold-config: Threshold config parsed: 0 rule(s) found
-Info: detect: 1 signatures processed. 0 are IP-only rules, 0 are inspecting packet payload, 1 inspect application layer, 0 are decoder event only
-Info: pcap: Starting file run for /pcap/juice-shop-ci-sqli.pcapng
-Notice: threads: Threads created -> RX: 1 W: 4 FM: 1 FR: 1   Engine started.
-Info: pcap: pcap file /pcap/juice-shop-ci-sqli.pcapng end of file reached (pcap err code 0)
-Notice: suricata: Signal Received.  Stopping engine.
-Info: suricata: time elapsed 0.170s
-Warning: pcap: 1/1th of packets have an invalid checksum, consider setting pcap-file.checksum-checks variable to no or use '-k none' option on command line.
-Notice: pcap: read 1 file, 54 packets, 30000 bytes
-Info: counters: Alerts: 0
+i: suricata: This is Suricata version 8.0.7 RELEASE running in USER mode
+i: threads: Threads created -> RX: 1 W: 4 FM: 1 FR: 1   Engine started.
+i: suricata: Signal Received.  Stopping engine.
+i: pcap: read 1 file, 105 packets, 42302 bytes

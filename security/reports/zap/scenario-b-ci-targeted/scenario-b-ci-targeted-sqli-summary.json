@@ -1,0 +1,12 @@
+{
+  "target": "http://10.20.10.20:3000",
+  "sql_injection_40018_count": 1,
+  "evidence": [
+    {
+      "url": "http://10.20.10.20:3000/rest/products/search?q=apple%27",
+      "param": "q",
+      "attack": "apple'",
+      "risk": "High"
+    }
+  ]
+}

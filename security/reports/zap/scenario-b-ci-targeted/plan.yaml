@@ -21,21 +21,17 @@ jobs:
       maxDepth: 3
 
   - type: requestor
-    parameters:
-      user: ""
     requests:
-      # seed the controlled login request so the SQLi scanner has an attack point
+      # seed the known SQLi-vulnerable endpoints so the active scanner has attack points in scope
+      - url: "http://10.20.10.20:3000/rest/products/search?q=test"
+        method: "GET"
       - url: "http://10.20.10.20:3000/rest/user/login"
         method: "POST"
-        headers:
-          - name: "Content-Type"
-            value: "application/json"
         data: '{"email":"test@test.local","password":"test"}'
 
   - type: activeScan
     parameters:
       context: juice-shop
-      policy: "sqli-only"
       maxRuleDurationInMins: 2
       maxScanDurationInMins: 5
     policyDefinition:

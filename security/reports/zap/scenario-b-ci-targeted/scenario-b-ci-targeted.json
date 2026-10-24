@@ -1,0 +1,43 @@
+{
+  "@programName": "ZAP",
+  "@version": "2.17.0",
+  "site": [
+    {
+      "@name": "http://10.20.10.20:3000",
+      "@host": "10.20.10.20",
+      "@port": "3000",
+      "alerts": [
+        {
+          "pluginid": "10098",
+          "name": "Cross-Domain Misconfiguration",
+          "riskcode": null,
+          "riskdesc": "Medium",
+          "count": 1,
+          "instances": [
+            {
+              "uri": "http://10.20.10.20:3000/rest/products/search?q=test",
+              "param": "",
+              "attack": "",
+              "evidence": "Access-Control-Allow-Origin: *"
+            }
+          ]
+        },
+        {
+          "pluginid": "40018",
+          "name": "SQL Injection",
+          "riskcode": null,
+          "riskdesc": "High",
+          "count": 1,
+          "instances": [
+            {
+              "uri": "http://10.20.10.20:3000/rest/products/search?q=apple%27",
+              "param": "q",
+              "attack": "apple'",
+              "evidence": "HTTP/1.1 500 Internal Server Error"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

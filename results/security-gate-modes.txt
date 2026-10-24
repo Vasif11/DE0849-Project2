@@ -1,0 +1,16 @@
+######################################################################
+# Security Gate demonstration on the SAME evidence (RUN passed)
+# Tool result -> Finding -> Gate decision are reported separately.
+######################################################################
+
+===== GATE_MODE=REPORT_ONLY =====
+TOOL RESULTS:  ZAP_40018=1  Suricata_1000001=1  Correlation=CORRELATED  Trivy_HIGH=54  Trivy_CRITICAL=12
+FINDING: Trivy HIGH/CRITICAL=66 -> informational under REPORT_ONLY
+GATE_DECISION (REPORT_ONLY): PASS
+(exit 0)
+
+===== GATE_MODE=ENFORCE =====
+TOOL RESULTS:  ZAP_40018=1  Suricata_1000001=1  Correlation=CORRELATED  Trivy_HIGH=54  Trivy_CRITICAL=12
+FINDING: Trivy HIGH/CRITICAL=66 -> ENFORCE threshold violated (blocking)
+GATE_DECISION (ENFORCE): FAIL  reasons: trivy-high/critical(ENFORCE);
+(exit 1)
